@@ -26,6 +26,7 @@ public class MultipartHeaders {
         return ((List<?>)value).size() > 0 ? (String)((List<?>) value).get(0) : null;
     }
 
+    @SuppressWarnings("unchecked")
     public List<String> getValues(String headerName) {
         headerName = headerName.toLowerCase();
         Object value = headerValues.get(headerName);
@@ -36,7 +37,6 @@ public class MultipartHeaders {
             return List.of((String)value);
         }
         // Only [value instanceof List] is possible from here
-        //noinspection unchecked
         return Collections.unmodifiableList((List<String>) value);
     }
 
@@ -57,6 +57,7 @@ public class MultipartHeaders {
         return headers;
     }
 
+    @SuppressWarnings("unchecked")
     private void addValue(String headerName, String value) {
         headerName = headerName.toLowerCase();
         Object oldValue = headerValues.get(headerName);
@@ -72,7 +73,6 @@ public class MultipartHeaders {
             return;
         }
         // Only [oldValue instanceof List] is possible from here
-        //noinspection unchecked
         ((List<String>)oldValue).add(value);
     }
 
