@@ -14,6 +14,7 @@ public class MultipartHeaders {
     private final Map<String, Object> headerValues = new HashMap<>(2);
 
     public String getValue(String headerName) {
+        headerName = headerName.toLowerCase();
         Object value = headerValues.get(headerName);
         if (value == null) {
             return null;
@@ -26,6 +27,7 @@ public class MultipartHeaders {
     }
 
     public List<String> getValues(String headerName) {
+        headerName = headerName.toLowerCase();
         Object value = headerValues.get(headerName);
         if (value == null) {
             return null;
@@ -56,6 +58,7 @@ public class MultipartHeaders {
     }
 
     private void addValue(String headerName, String value) {
+        headerName = headerName.toLowerCase();
         Object oldValue = headerValues.get(headerName);
         if (oldValue == null) {
             headerValues.put(headerName, value);

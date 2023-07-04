@@ -1,5 +1,6 @@
 package au.com.villar.web.mfd;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public final class MultipartProcessor {
@@ -8,43 +9,62 @@ public final class MultipartProcessor {
         throw new IllegalAccessException("No instances for you");
     }
 
-    public static void process(String boundary, InputStream input, MultipartProcessorListener listener) {
+    public static void process(String boundary, InputStream input, MultipartProcessorListener listener)
+            throws IOException {
 
+        int[] delimiter = calculateDelimiterBytes(boundary);
+        consumeInitialDelimiter(input, delimiter);
+        while(!endDetectedConsumingNewLine(input)) {
+            MultipartHeaders headers = MultipartHeaders.parseHeaders(input);
+            InputStream partBody = new MultipartInputStream(input, delimiter);
+            listener.onPart(headers, partBody);
+        }
     }
-/*
 
-POST / HTTP/1.1
-[[ Less interesting headers ... ]]
-Content-Type: multipart/form-data; boundary=---------------------------735323031399963166993862150
-Content-Length: 834
+    private static boolean endDetectedConsumingNewLine(InputStream input) throws IOException {
+        int ch1 = input.read();
+        int ch2 = input.read();
+        if (ch1 == '\r' && ch2 == '\n') {
+            return false;
+        }
+        if (ch1 == '-' && ch2 == '-') {
+            while (ch1 != -1) {
+                ch1 = input.read();
+            }
+            return true;
+        }
+        throw new IOException("Unexpected char sequence reading between parts");
+    }
 
------------------------------735323031399963166993862150
-Content-Disposition: form-data; name="text1"
+    private static int[] calculateDelimiterBytes(String boundary) {
+        byte[] boundaryBytes = boundary.getBytes();
+        int[] delimiter = new int[boundaryBytes.length + 4];
 
-text default
------------------------------735323031399963166993862150
-Content-Disposition: form-data; name="text2"
+        for(int x = 0; x < boundaryBytes.length; x++) {
+            delimiter[x + 4] = 0xFF & boundaryBytes[x];
+        }
+        delimiter[0] = '\r';
+        delimiter[1] = '\n';
+        delimiter[2] = '-';
+        delimiter[3] = '-';
+        return delimiter;
+    }
 
-aωb
------------------------------735323031399963166993862150
-Content-Disposition: form-data; name="file1"; filename="a.txt"
-Content-Type: text/plain
+    private static void consumeInitialDelimiter(InputStream input, int[] delimiter) throws IOException {
 
-Content of a.txt.
+        int read = -1;
+        int suspectedDelimiterRead = 2;
+        while (suspectedDelimiterRead < delimiter.length && (read = input.read()) != -1) {
+            if (read == delimiter[suspectedDelimiterRead]) {
+                suspectedDelimiterRead++;
+            } else {
+                suspectedDelimiterRead = 2;
+            }
+        }
 
------------------------------735323031399963166993862150
-Content-Disposition: form-data; name="file2"; filename="a.html"
-Content-Type: text/html
+        if (read == -1) {
+            throw new IOException("Initial delimiter not found");
+        }
+    }
 
-<!DOCTYPE html><title>Content of a.html.</title>
-
------------------------------735323031399963166993862150
-Content-Disposition: form-data; name="file3"; filename="binary"
-Content-Type: application/octet-stream
-
-aωb
------------------------------735323031399963166993862150--
-
-
-*/
 }
