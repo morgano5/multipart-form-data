@@ -56,6 +56,33 @@ class MultipartHeadersTest {
         assertEquals(-1, ch4);
     }
 
+    @Test
+    void shouldExtractFileAndFilename() throws IOException {
+        MultipartHeaders headers = MultipartHeaders.parseHeaders(
+                toStream("Content-Disposition: form-data; name=\"file1\"; filename=\"my_file.txt\"\r\n\r\n"));
+
+        assertEquals("file1", headers.getName());
+        assertEquals("my_file.txt", headers.getFilename());
+    }
+
+    @Test
+    void shouldUnescapeFieldValues() throws IOException {
+        MultipartHeaders headers = MultipartHeaders.parseHeaders(
+                toStream("Content-Disposition: form-data; name=\"file1\"; filename=\"my%20file.txt\"\r\n\r\n"));
+
+        assertEquals("file1", headers.getName());
+        assertEquals("my file.txt", headers.getFilename());
+    }
+
+    @Test
+    void shouldUnescapeWeirdFieldValues() throws IOException {
+        MultipartHeaders headers = MultipartHeaders.parseHeaders(
+                toStream("Content-Disposition: form-data; name=\"file1\"; filename=\"my%20file%0A.txt\"\r\n\r\n"));
+
+        assertEquals("file1", headers.getName());
+        assertEquals("my file\n.txt", headers.getFilename());
+    }
+
     private InputStream toStream(String header) {
         return new ByteArrayInputStream(header.getBytes());
     }
