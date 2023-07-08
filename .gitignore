@@ -12,7 +12,17 @@ hs_err_pid*
 replay_pid*
 
 # IntelliJ Files
-.idea
+.idea/
+*.iml
+*.iws
+
+# Eclipse Files
+.classpath
+.project
+.settings/
 
 # Build
 /target
+
+# Mac
+.DS_Store
