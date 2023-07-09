@@ -45,6 +45,10 @@ public final class MultipartProcessor {
         while(!endDetectedConsumingNewLine(input)) {
             Part part = Part.readPart(input, delimiter);
             listener.onPart(part);
+            int read;
+            do {
+                read = part.getBodyStream().read();
+            } while (read != -1);
         }
     }
 
