@@ -17,10 +17,18 @@
 package au.id.villar.web.mfd;
 
 import java.io.IOException;
-import java.io.InputStream;
 
+/**
+ * Listener used to process a part in a multipart request body.
+ */
+@FunctionalInterface
 public interface MultipartProcessorListener {
 
-    void onPart(MultipartHeaders headers, InputStream stream) throws IOException;
+    /**
+     * Called when a part has been detected when parsing a multipart http request body.
+     * @param part An object representing the part.
+     * @throws IOException If the underlying part throws this exception, or at implementer's discretion.
+     */
+    void onPart(Part part) throws IOException;
 
 }

@@ -18,111 +18,30 @@ package au.id.villar.web.mfd;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-public class MultipartHeaders {
+/**
+ * Utils to parse content from Strings of InputStreams.
+ */
+final class ParseUtils {
 
-    private final Map<String, Object> headerValues = new HashMap<>(2);
-    private String name;
-    private String filename;
-
-    public String getValue(String headerName) {
-        headerName = headerName.toLowerCase();
-        Object value = headerValues.get(headerName);
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof String) {
-            return (String)value;
-        }
-        // Only [value instanceof List] is possible from here
-        return ((List<?>)value).size() > 0 ? (String)((List<?>) value).get(0) : null;
+    private ParseUtils() throws IllegalAccessException {
+        throw new IllegalAccessException("No instances for you");
     }
 
-    @SuppressWarnings("unchecked")
-    public List<String> getValues(String headerName) {
-        headerName = headerName.toLowerCase();
-        Object value = headerValues.get(headerName);
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof String) {
-            return List.of((String)value);
-        }
-        // Only [value instanceof List] is possible from here
-        return Collections.unmodifiableList((List<String>) value);
+    static String readHeaderName(InputStream inputStream) throws IOException {
+        return readToDelimiter(inputStream, ':', true);
     }
 
-    public Set<String> getHeaders() {
-        return headerValues.keySet();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
-
-    static MultipartHeaders parseHeaders(InputStream inputStream) throws IOException {
-        MultipartHeaders headers = new MultipartHeaders();
-        String headerName;
-        do {
-            headerName = readHeaderName(inputStream);
-            if (!headerName.isEmpty()) {
-                String value = readRestOfLine(inputStream);
-                headers.addValue(headerName, value);
-                if ("content-disposition".equals(headerName)) {
-                    headers.assignNameAndFilename(value);
-                }
-            }
-        } while (!headerName.isEmpty());
-        return headers;
-    }
-
-    @SuppressWarnings("unchecked")
-    private void addValue(String headerName, String value) {
-        Object oldValue = headerValues.get(headerName);
-        if (oldValue == null) {
-            headerValues.put(headerName, value);
-            return;
+    static String readRestOfLine(InputStream inputStream) throws IOException {
+        String value = readToDelimiter(inputStream, '\r', false);
+        int read = inputStream.read();
+        if (read != '\n') {
+            throw new IOException("Unexpected character reading value");
         }
-        if (oldValue instanceof String) {
-            List<String> values = new ArrayList<>();
-            values.add((String)oldValue);
-            values.add(value);
-            headerValues.put(headerName, values);
-            return;
-        }
-        // Only [oldValue instanceof List] is possible from here
-        ((List<String>)oldValue).add(value);
+        return value;
     }
 
-    private void assignNameAndFilename(String headerValue) {
-
-        if(!headerValue.startsWith("form-data")) {
-            return;
-        }
-
-        String nameValue = getValueForKey("name", headerValue);
-        String filenameValue = getValueForKey("filename", headerValue);
-
-        if (nameValue != null) {
-            this.name = nameValue;
-        }
-
-        if (filenameValue != null) {
-            this.filename = filenameValue;
-        }
-    }
-
-    private static String getValueForKey(String key, String headerValue) {
+    static String getValueForKey(String key, String headerValue) {
 
         final int SCAN_FOR_KEY = 0,     SKIP_KEY = 1,         SKIP_VALUE = 2,       SKIP_TO_QUOTE = 3,
                   SKIP_TO_SPACE = 4,    VALUE_START = 5,      READ_VALUE = 6,       READ_TO_QUOTE = 7,
@@ -212,7 +131,7 @@ public class MultipartHeaders {
         return builder.toString();
     }
 
-    private static int hexToDecimal(int ch) {
+    private static int hexToDecimal(char ch) {
         if (ch >= '0' && ch <= '9') {
             return ch & 0xF;
         }
@@ -221,19 +140,6 @@ public class MultipartHeaders {
             return ch - 87;
         }
         return -1;
-    }
-
-    private static String readHeaderName(InputStream inputStream) throws IOException {
-        return readToDelimiter(inputStream, ':', true);
-    }
-
-    private static String readRestOfLine(InputStream inputStream) throws IOException {
-        String value = readToDelimiter(inputStream, '\r', false);
-        int read = inputStream.read();
-        if (read != '\n') {
-            throw new IOException("Unexpected character reading value");
-        }
-        return value;
     }
 
     private static String readToDelimiter(InputStream inputStream, char delimiter, boolean toLowerCase)
@@ -282,4 +188,7 @@ public class MultipartHeaders {
         }
         return read;
     }
+
+
+
 }

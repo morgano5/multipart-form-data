@@ -37,14 +37,14 @@ class MultipartProcessorTest {
                 + "Content-Type: text/plain\r\n\r\nCONTENT HERE\nLINE 2\nLINE 3\n\r\n"
                 + "--" + boundary + "--\r\n";
 
-        List<Part> parts = runTestCase(boundary, content);
+        List<ResultPart> resultParts = runTestCase(boundary, content);
 
-        assertEquals(1, parts.size());
-        assertEquals("CONTENT HERE\nLINE 2\nLINE 3\n", parts.get(0).content);
-        assertEquals(Set.of("content-disposition", "content-type"), parts.get(0).headers.getHeaders());
+        assertEquals(1, resultParts.size());
+        assertEquals("CONTENT HERE\nLINE 2\nLINE 3\n", resultParts.get(0).content);
+        assertEquals(Set.of("content-disposition", "content-type"), resultParts.get(0).headers.getHeaderNames());
         assertEquals("form-data; name=\"file1\"; filename=\"my_file.txt\"",
-                parts.get(0).headers.getValue("Content-Disposition"));
-        assertEquals("text/plain", parts.get(0).headers.getValue("Content-Type"));
+                resultParts.get(0).headers.getHeaderValue("Content-Disposition"));
+        assertEquals("text/plain", resultParts.get(0).headers.getHeaderValue("Content-Type"));
     }
 
     @Test
@@ -58,19 +58,19 @@ class MultipartProcessorTest {
                 + "Content-Type: text/other\r\n\r\nMORE HERE\nLINE 2\nLINE 3\n\r\n"
                 + "--" + boundary + "--\r\n";
 
-        List<Part> parts = runTestCase(boundary, content);
+        List<ResultPart> resultParts = runTestCase(boundary, content);
 
-        assertEquals(2, parts.size());
-        assertEquals("CONTENT HERE\nLINE 2\nLINE 3\n", parts.get(0).content);
-        assertEquals(Set.of("content-disposition", "content-type"), parts.get(0).headers.getHeaders());
+        assertEquals(2, resultParts.size());
+        assertEquals("CONTENT HERE\nLINE 2\nLINE 3\n", resultParts.get(0).content);
+        assertEquals(Set.of("content-disposition", "content-type"), resultParts.get(0).headers.getHeaderNames());
         assertEquals("form-data; name=\"file1\"; filename=\"my_file.txt\"",
-                parts.get(0).headers.getValue("Content-Disposition"));
-        assertEquals("text/plain", parts.get(0).headers.getValue("Content-Type"));
-        assertEquals("MORE HERE\nLINE 2\nLINE 3\n", parts.get(1).content);
-        assertEquals(Set.of("content-disposition", "content-type"), parts.get(1).headers.getHeaders());
+                resultParts.get(0).headers.getHeaderValue("Content-Disposition"));
+        assertEquals("text/plain", resultParts.get(0).headers.getHeaderValue("Content-Type"));
+        assertEquals("MORE HERE\nLINE 2\nLINE 3\n", resultParts.get(1).content);
+        assertEquals(Set.of("content-disposition", "content-type"), resultParts.get(1).headers.getHeaderNames());
         assertEquals("form-data; name=\"file2\"; filename=\"my_file_2.txt\"",
-                parts.get(1).headers.getValue("Content-Disposition"));
-        assertEquals("text/other", parts.get(1).headers.getValue("Content-Type"));
+                resultParts.get(1).headers.getHeaderValue("Content-Disposition"));
+        assertEquals("text/other", resultParts.get(1).headers.getHeaderValue("Content-Type"));
     }
 
     @Test
@@ -81,14 +81,14 @@ class MultipartProcessorTest {
                 + "Content-Type: text/plain\r\n\r\nCONTENT HERE\nLINE 2\nLINE 3\n\r\n"
                 + "--" + boundary + "--\r\n";
 
-        List<Part> parts = runTestCase(boundary, content);
+        List<ResultPart> resultParts = runTestCase(boundary, content);
 
-        assertEquals(1, parts.size());
-        assertEquals("CONTENT HERE\nLINE 2\nLINE 3\n", parts.get(0).content);
-        assertEquals(Set.of("content-disposition", "content-type"), parts.get(0).headers.getHeaders());
+        assertEquals(1, resultParts.size());
+        assertEquals("CONTENT HERE\nLINE 2\nLINE 3\n", resultParts.get(0).content);
+        assertEquals(Set.of("content-disposition", "content-type"), resultParts.get(0).headers.getHeaderNames());
         assertEquals("form-data; name=\"file1\"; filename=\"my_file.txt\"",
-                parts.get(0).headers.getValue("Content-Disposition"));
-        assertEquals("text/plain", parts.get(0).headers.getValue("Content-Type"));
+                resultParts.get(0).headers.getHeaderValue("Content-Disposition"));
+        assertEquals("text/plain", resultParts.get(0).headers.getHeaderValue("Content-Type"));
     }
 
     @Test
@@ -99,14 +99,14 @@ class MultipartProcessorTest {
                 + "Content-Type: text/plain\r\n\r\nCONTENT HERE\nLINE 2\nLINE 3\n\r\n"
                 + "--" + boundary + "--Some random content after the multipart section\r\n";
 
-        List<Part> parts = runTestCase(boundary, content);
+        List<ResultPart> resultParts = runTestCase(boundary, content);
 
-        assertEquals(1, parts.size());
-        assertEquals("CONTENT HERE\nLINE 2\nLINE 3\n", parts.get(0).content);
-        assertEquals(Set.of("content-disposition", "content-type"), parts.get(0).headers.getHeaders());
+        assertEquals(1, resultParts.size());
+        assertEquals("CONTENT HERE\nLINE 2\nLINE 3\n", resultParts.get(0).content);
+        assertEquals(Set.of("content-disposition", "content-type"), resultParts.get(0).headers.getHeaderNames());
         assertEquals("form-data; name=\"file1\"; filename=\"my_file.txt\"",
-                parts.get(0).headers.getValue("Content-Disposition"));
-        assertEquals("text/plain", parts.get(0).headers.getValue("Content-Type"));
+                resultParts.get(0).headers.getHeaderValue("Content-Disposition"));
+        assertEquals("text/plain", resultParts.get(0).headers.getHeaderValue("Content-Type"));
     }
 
     @Test
@@ -117,14 +117,14 @@ class MultipartProcessorTest {
                 + "Content-Type: text/plain\r\n\r\n\r\n"
                 + "--" + boundary + "--\r\n";
 
-        List<Part> parts = runTestCase(boundary, content);
+        List<ResultPart> resultParts = runTestCase(boundary, content);
 
-        assertEquals(1, parts.size());
-        assertEquals("", parts.get(0).content);
-        assertEquals(Set.of("content-disposition", "content-type"), parts.get(0).headers.getHeaders());
+        assertEquals(1, resultParts.size());
+        assertEquals("", resultParts.get(0).content);
+        assertEquals(Set.of("content-disposition", "content-type"), resultParts.get(0).headers.getHeaderNames());
         assertEquals("form-data; name=\"file1\"; filename=\"my_file.txt\"",
-                parts.get(0).headers.getValue("Content-Disposition"));
-        assertEquals("text/plain", parts.get(0).headers.getValue("Content-Type"));
+                resultParts.get(0).headers.getHeaderValue("Content-Disposition"));
+        assertEquals("text/plain", resultParts.get(0).headers.getHeaderValue("Content-Type"));
     }
 
     @Test
@@ -133,28 +133,28 @@ class MultipartProcessorTest {
         String content = "--" + boundary + "\r\n\r\nCONTENT HERE\nLINE 2\nLINE 3\n\r\n"
                 + "--" + boundary + "--\r\n";
 
-        List<Part> parts = runTestCase(boundary, content);
+        List<ResultPart> resultParts = runTestCase(boundary, content);
 
-        assertEquals(1, parts.size());
-        assertEquals("CONTENT HERE\nLINE 2\nLINE 3\n", parts.get(0).content);
-        assertEquals(Set.of(), parts.get(0).headers.getHeaders());
+        assertEquals(1, resultParts.size());
+        assertEquals("CONTENT HERE\nLINE 2\nLINE 3\n", resultParts.get(0).content);
+        assertEquals(Set.of(), resultParts.get(0).headers.getHeaderNames());
     }
 
-    private static List<Part> runTestCase(String boundary, String content) throws IOException {
+    private static List<ResultPart> runTestCase(String boundary, String content) throws IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(content.getBytes());
 
-        List<Part> parts = new ArrayList<>();
-        MultipartProcessor.process(boundary, inputStream, ((headers, stream) -> {
+        List<ResultPart> resultParts = new ArrayList<>();
+        MultipartProcessor.process(boundary, inputStream, ((part) -> {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             try {
-                stream.transferTo(buffer);
+                part.getBodyStream().transferTo(buffer);
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
-            parts.add(new Part(headers, buffer.toString()));
+            resultParts.add(new ResultPart(part, buffer.toString()));
         }));
-        return parts;
+        return resultParts;
     }
 
-    private record Part(MultipartHeaders headers, String content) {}
+    private record ResultPart(au.id.villar.web.mfd.Part headers, String content) {}
 }

@@ -19,21 +19,32 @@ package au.id.villar.web.mfd;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Utility class to read a multipart body from and HTTP request.
+ */
 public final class MultipartProcessor {
 
     private MultipartProcessor() throws IllegalAccessException {
         throw new IllegalAccessException("No instances for you");
     }
 
+    /**
+     * Runs the process of reading multipart body. For each part in the multipart request, the provided listener will
+     * be called.
+     * @param boundary The boundary field as specified in the Content-Type header.
+     * @param input The {@link java.io.InputStream} representing the http body.
+     * @param listener The {@link MultipartProcessorListener} to be invoked on each part.
+     * @throws IOException If the provided {@link java.io.InputStream} throws this exception, or if it is detected that
+     * the body is not actually multipart type.
+     */
     public static void process(String boundary, InputStream input, MultipartProcessorListener listener)
             throws IOException {
 
         int[] delimiter = calculateDelimiterBytes(boundary);
         consumeInitialDelimiter(input, delimiter);
         while(!endDetectedConsumingNewLine(input)) {
-            MultipartHeaders headers = MultipartHeaders.parseHeaders(input);
-            InputStream partBody = new MultipartInputStream(input, delimiter);
-            listener.onPart(headers, partBody);
+            Part part = Part.readPart(input, delimiter);
+            listener.onPart(part);
         }
     }
 
