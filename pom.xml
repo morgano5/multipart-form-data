@@ -13,6 +13,9 @@
         A brief, framework-agnostic, pseudo-reactive style library to parse the body of a multipart/form-data request.
     </description>
     <url>https://github.com/morgano5/multipart-form-data</url>
+    <scm>
+        <url>https://github.com/morgano5/multipart-form-data.git</url>
+    </scm>
     <licenses>
         <license>
             <name>Apache-2.0</name>
