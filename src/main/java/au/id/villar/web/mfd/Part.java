@@ -37,6 +37,8 @@ public class Part {
     private String filename;
     private InputStream input;
 
+    private Part() {}
+
     /**
      * Retrieves the first value found for a header.
      * @param headerName the name of the header whose value is requested.
