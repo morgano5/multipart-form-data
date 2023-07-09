@@ -20,6 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 
+/**
+ * InputStream which wraps another one and reads up to the given delimiter. Once the delimiter has been reached, this
+ * InputStream returns EOF (-1) when further reads are attempted.
+ */
 class MultipartInputStream extends InputStream {
 
     private final PushbackInputStream wrappedInputStream;

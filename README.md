@@ -22,13 +22,13 @@ public class MyListener implements MultipartProcessorListener {
     Path storageDir = Path.of("/path/to/dir");
 
     @Override
-    public void onPart(MultipartHeaders headers, InputStream stream) throws IOException {
+    public void onPart(Part part) throws IOException {
 
-        String filename = headers.getFilename();
+        String filename = part.getFilename();
         Path destinationPath = storageDir.resolve(filename);
 
         try (FileOutputStream destination = new FileOutputStream(destinationPath.toFile())) {
-            stream.transferTo(destination);
+            part.getBodyStream().transferTo(destination);
         }
     }
 
