@@ -87,7 +87,7 @@ final class ParseUtils {
 
                 case READ_VALUE -> {
                     state = headerValue.charAt(x) == '"' ? READ_TO_QUOTE : READ_TO_SPACE;
-                    valueStart = x + 1;
+                    valueStart = state == READ_TO_QUOTE ? x + 1 : x;
                 }
 
                 case READ_TO_QUOTE -> {
@@ -103,7 +103,7 @@ final class ParseUtils {
                 }
             }
         }
-        return null;
+        return state == READ_TO_SPACE ? unescapeValue(headerValue, valueStart, headerValue.length()) : null;
     }
 
     private static String unescapeValue(String headerValue, int start, int end) {
