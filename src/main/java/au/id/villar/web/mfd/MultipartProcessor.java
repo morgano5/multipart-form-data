@@ -48,6 +48,15 @@ public final class MultipartProcessor {
         }
     }
 
+    /**
+     * Extracts the boundary value from a Content-Type value.
+     * @param contentTypeValue the value of a content-type header, of type multipart.
+     * @return The boundary value, or {@code null} if it was not found
+     */
+    public static String extractBoundary(String contentTypeValue) {
+        return ParseUtils.getValueForKey("boundary", contentTypeValue);
+    }
+
     private static boolean endDetectedConsumingNewLine(InputStream input) throws IOException {
         int ch1 = input.read();
         int ch2 = input.read();

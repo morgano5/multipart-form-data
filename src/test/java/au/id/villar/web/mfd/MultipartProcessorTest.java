@@ -140,6 +140,22 @@ class MultipartProcessorTest {
         assertEquals(Set.of(), resultParts.get(0).headers.getHeaderNames());
     }
 
+    @Test
+    void shouldExtractBoundary() {
+        String contentType = "multipart/form-data; boundary=----ABC";
+        String boundary = MultipartProcessor.extractBoundary(contentType);
+
+        assertEquals("----ABC", boundary);
+    }
+
+    @Test
+    void shouldReturnNullIfNotBoundaryProvided() {
+        String contentType = "multipart/form-data; noboundary=----ABC";
+        String boundary = MultipartProcessor.extractBoundary(contentType);
+
+        assertNull(boundary);
+    }
+
     private static List<ResultPart> runTestCase(String boundary, String content) throws IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(content.getBytes());
 
