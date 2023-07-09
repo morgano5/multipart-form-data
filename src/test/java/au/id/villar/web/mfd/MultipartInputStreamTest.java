@@ -82,6 +82,18 @@ class MultipartInputStreamTest {
     }
 
     @Test
+    void shouldReadContentWithFirstCharOfDelimiterInBody() throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try (InputStream testingStream  = createTestCase(
+                "Testing content\r\n\rLine Three\r\n--DELIMITER")) {
+            testingStream.transferTo(buffer);
+        }
+        String finalPart = buffer.toString();
+
+        assertEquals("Testing content\r\n\rLine Three", finalPart);
+    }
+
+    @Test
     void shouldReadContentWithFirstPartOfDelimiterAtTheEnd() throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try (InputStream testingStream  = createTestCase("Testing content\r\nLine Two\r\n--DELIMIT\r\n--DELIMITER")) {

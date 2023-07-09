@@ -61,7 +61,12 @@ class MultipartInputStream extends InputStream {
 
         if (posSuspectedBoundary > 0) {
             wrappedInputStream.unread(read);
-            return delimiter[posReturnFakePositive++];
+            read = delimiter[posReturnFakePositive++];
+            if (posReturnFakePositive == posSuspectedBoundary) {
+                posReturnFakePositive = 0;
+                posSuspectedBoundary = 0;
+            }
+            return read;
         }
 
         if (read == -1) {
